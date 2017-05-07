@@ -1,0 +1,94 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <script>
+      // Create a canvas that extends the entire screen
+      // and it will draw right over the other html elements, like buttons, etc
+      var canvas = document.createElement("canvas");
+      canvas.setAttribute("width", window.innerWidth);
+      canvas.setAttribute("height", window.innerHeight);
+      canvas.setAttribute("style", "position: absolute; x:0; y:0;");
+      document.body.appendChild(canvas);
+
+      var ctx = canvas.getContext("2d");
+
+      var gridSize = 2;
+      var incrementSize = 0.01;
+      var maxIterations = 6;
+      var canvasOffset = gridSize;
+      var scale = 100;
+
+      for (var y = -gridSize; y <= gridSize; y+=incrementSize) {
+        for (var x = -gridSize; x <= gridSize; x+=incrementSize) {
+          var iterations = mandelbrot(x, y, x, y, 1);
+          var colour = colourify(iterations);
+          draw(x, y, canvasOffset, colour, scale, ctx);
+          //console.log("x, y, itr:", x, y, iterations);
+        }
+      }
+
+      function mandelbrot(ox, oy, px, py, itr) {
+        //console.log("itr:", itr);
+        if (itr > maxIterations) {
+          return itr;
+        }
+
+        var zx = (px*px - py*py) + ox;
+        var zy = (2*px*py) + oy;
+
+        var d = distance(zx, zy);
+
+        if (d <= gridSize) {
+          return mandelbrot(ox, oy, zx, zy, itr+=1);
+        }
+
+        return itr;
+      }
+
+      function distance(x, y) {
+        return Math.sqrt(x*x + y*y);
+      }
+
+      function colourify(num) {
+        var colour;
+        switch (num) {
+          case 1:
+            colour = "#ffffff";
+            break;
+          case 2:
+            // blue
+            colour = "#2e6caa";
+            break;
+          case 3:
+            // purple
+            colour = "#ff3af1";
+            break;
+          case 4:
+            // red
+            colour = "#ff0000";
+            break;
+          case 5:
+            // orange
+            colour = "#ff6100";
+            break;
+          case 6:
+            // yellow
+            colour = "#ffbf00";
+            break;
+          default:
+            colour = "#000000";
+        }
+        return colour;
+      }
+
+      function draw(x, y, offset, colour, scale, canvas) {
+        canvas.fillStyle = colour;
+        var cx = (x + offset) * scale;
+        var cy = (-y + offset) * scale;
+        canvas.fillRect(cx, cy, scale, scale);
+      }
+
+    </script>
+  </body>
+</html>
