@@ -8,22 +8,27 @@
       var canvas = document.createElement("canvas");
       canvas.setAttribute("width", window.innerWidth);
       canvas.setAttribute("height", window.innerHeight);
-      canvas.setAttribute("style", "position: absolute; x:0; y:0;");
+      canvas.setAttribute("style", "width: 100%; height: 100%; margin: 0px; position: absolute; x:0; y:0;");
       document.body.appendChild(canvas);
 
       var ctx = canvas.getContext("2d");
 
-      var gridSize = 2;
-      var incrementSize = 0.01;
-      var maxIterations = 6;
-      var canvasOffset = gridSize;
-      var scale = 100;
+      var gridSizeXStart = -1.5;
+      var gridSizeXEnd = 0.5;
+      var gridSizeYStart = -1.5;
+      var gridSizeYEnd = 1;
+      var maxDistance = 2;
+      var incrementSize = 0.001;
+      var scale = 250;
+      var colourCount = 6;
+      var colourDistance = 15;
+      var maxIterations = colourCount * colourDistance;
 
-      for (var y = -gridSize; y <= gridSize; y+=incrementSize) {
-        for (var x = -gridSize; x <= gridSize; x+=incrementSize) {
+      for (var y = gridSizeYStart; y <= gridSizeYEnd; y+=incrementSize) {
+        for (var x = gridSizeXStart; x <= gridSizeXEnd; x+=incrementSize) {
           var iterations = mandelbrot(x, y, x, y, 1);
-          var colour = colourify(iterations);
-          draw(x, y, canvasOffset, colour, scale, ctx);
+          var colour = colourify(iterations, maxIterations);
+          draw(x, y, gridSizeXStart, gridSizeYStart, colour, scale, ctx);
           //console.log("x, y, itr:", x, y, iterations);
         }
       }
@@ -39,7 +44,7 @@
 
         var d = distance(zx, zy);
 
-        if (d <= gridSize) {
+        if (d <= maxDistance) {
           return mandelbrot(ox, oy, zx, zy, itr+=1);
         }
 
@@ -50,44 +55,26 @@
         return Math.sqrt(x*x + y*y);
       }
 
-      function colourify(num) {
-        var colour;
-        switch (num) {
-          case 1:
-            colour = "#ffffff";
-            break;
-          case 2:
-            // blue
-            colour = "#2e6caa";
-            break;
-          case 3:
-            // purple
-            colour = "#ff3af1";
-            break;
-          case 4:
-            // red
-            colour = "#ff0000";
-            break;
-          case 5:
-            // orange
-            colour = "#ff6100";
-            break;
-          case 6:
-            // yellow
-            colour = "#ffbf00";
-            break;
-          default:
-            colour = "#000000";
-        }
-        return colour;
-      }
+	  function colourify(num, maxItr) {
+		  var colour;
 
-      function draw(x, y, offset, colour, scale, canvas) {
-        canvas.fillStyle = colour;
-        var cx = (x + offset) * scale;
-        var cy = (-y + offset) * scale;
-        canvas.fillRect(cx, cy, scale, scale);
-      }
+		  if (num == 0) {
+			     colour = "#ffffff";
+		  } else if (num < maxItr) {
+			     colour = "#000000";
+		  } else {
+			     colour = "#ffdb4f"
+		  }
+
+		  return colour;
+	  }
+
+    function draw(x, y, offsetX, offsetY, colour, scale, canvas) {
+      canvas.fillStyle = colour;
+      var cx = (x - offsetX) * scale;
+      var cy = (y - offsetY) * scale;
+      canvas.fillRect(cx, cy, scale, scale);
+    }
 
     </script>
   </body>
